@@ -3,6 +3,7 @@ expr
 
 This package parses and evaluates mathematical expressions over
 floating-point numbers, like `2 + 2` or `cos(x/(2*pi)) * cos(y/(2*pi))`.
+It's a forked copy from darius's expr (https://github.com/darius/expr).
 
 The design priorities were ease of use with helpful error messages,
 ease of integration into applets, and good performance: fast
@@ -115,4 +116,4 @@ Contact
 =======
 
 See the file [COPYING](COPYING) for copyright info.
-Send questions and bug reports to Darius Bacon <darius@wry.me>.
+Send questions and bug reports to Harshavardhan Ramesh <harshavardhan_ramesh@outlook.com>.
