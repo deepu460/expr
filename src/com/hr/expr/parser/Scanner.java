@@ -1,15 +1,16 @@
 // Scan lexical tokens in input strings.
 
-package expr;
+package com.hr.expr.parser;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 class Scanner {
 
 	private String s;
 	private String operatorChars;
 
-	Vector<Token> tokens = new Vector<>();
+	List<Token> tokens = new ArrayList<>();
 	int index = -1;
 
 	public Scanner(String string, String operatorChars) {
@@ -32,13 +33,12 @@ class Scanner {
 		StringBuffer sb = new StringBuffer();
 		int whitespace = 0;
 		for (int i = 0; i < tokens.size(); ++i) {
-			Token t = (Token) tokens.elementAt(i);
+			Token t = (Token) tokens.get(i);
 
 			int spaces = (whitespace != 0 ? whitespace : t.leadingWhitespace);
 			if (i == 0)
 				spaces = 0;
-			else if (spaces == 0
-					&& !joinable((Token) tokens.elementAt(i - 1), t))
+			else if (spaces == 0 && !joinable((Token) tokens.get(i - 1), t))
 				spaces = 1;
 			for (int j = spaces; 0 < j; --j)
 				sb.append(" ");
@@ -77,7 +77,7 @@ class Scanner {
 	public Token getCurrentToken() {
 		if (atEnd())
 			return new Token(Token.TT_EOF, 0, s, s.length(), s.length());
-		return (Token) tokens.elementAt(index);
+		return (Token) tokens.get(index);
 	}
 
 	private int scanToken(int i) {
@@ -97,18 +97,18 @@ class Scanner {
 				else if (pair.equals("<>"))
 					ttype = Token.TT_NE;
 				if (0 != ttype) {
-					tokens.addElement(new Token(ttype, 0, s, i, i + 2));
+					tokens.add(new Token(ttype, 0, s, i, i + 2));
 					return i + 2;
 				}
 			}
-			tokens.addElement(new Token(s.charAt(i), 0, s, i, i + 1));
+			tokens.add(new Token(s.charAt(i), 0, s, i, i + 1));
 			return i + 1;
 		} else if (Character.isLetter(s.charAt(i))) {
 			return scanSymbol(i);
 		} else if (Character.isDigit(s.charAt(i)) || '.' == s.charAt(i)) {
 			return scanNumber(i);
 		} else {
-			tokens.addElement(makeErrorToken(i, i + 1));
+			tokens.add(makeErrorToken(i, i + 1));
 			return i + 1;
 		}
 	}
@@ -119,7 +119,7 @@ class Scanner {
 				&& (Character.isLetter(s.charAt(i)) || Character.isDigit(s
 						.charAt(i))))
 			++i;
-		tokens.addElement(new Token(Token.TT_WORD, 0, s, from, i));
+		tokens.add(new Token(Token.TT_WORD, 0, s, from, i));
 		return i;
 	}
 
@@ -138,11 +138,11 @@ class Scanner {
 		try {
 			nval = Double.valueOf(text).doubleValue();
 		} catch (NumberFormatException nfe) {
-			tokens.addElement(makeErrorToken(from, i));
+			tokens.add(makeErrorToken(from, i));
 			return i;
 		}
 
-		tokens.addElement(new Token(Token.TT_NUMBER, nval, s, from, i));
+		tokens.add(new Token(Token.TT_NUMBER, nval, s, from, i));
 		return i;
 	}
 

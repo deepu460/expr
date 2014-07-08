@@ -1,7 +1,7 @@
 // Syntax-error exception.
 // Copyright 1996 by Darius Bacon; see the file COPYING.
 
-package expr;
+package com.hr.expr.parser;
 
 /**
  * An exception indicating a problem in parsing an expression. It can produce a
@@ -82,6 +82,10 @@ public class SyntaxException extends Exception {
 		explainWhat(sb);
 
 		return sb.toString();
+	}
+
+	public void printExplanation() {
+		System.err.println(explain());
 	}
 
 	private Parser parser;

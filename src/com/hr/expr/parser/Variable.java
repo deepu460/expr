@@ -1,9 +1,12 @@
 // Variables associate values with names.
 // Copyright 1996 by Darius Bacon; see the file COPYING.
 
-package expr;
+package com.hr.expr.parser;
 
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.hr.expr.expression.Expr;
 
 /**
  * A variable is a simple expression with a name (like "x") and a settable
@@ -11,7 +14,7 @@ import java.util.Hashtable;
  */
 public class Variable extends Expr {
 
-	private static Hashtable<String, Variable> variables = new Hashtable<>();
+	private static Map<String, Variable> variables = new HashMap<>();
 
 	/**
 	 * Return a unique variable named `name'. There can be only one variable

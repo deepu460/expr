@@ -1,6 +1,11 @@
 // Run benchmarks from the command line.
 
-package expr;
+package com.hr.expr.example;
+
+import com.hr.expr.expression.Expr;
+import com.hr.expr.parser.Parser;
+import com.hr.expr.parser.SyntaxException;
+import com.hr.expr.parser.Variable;
 
 /**
  * Time evaluating many expressions over many values.

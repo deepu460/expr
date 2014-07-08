@@ -1,10 +1,13 @@
 // Operator-precedence parser.
 // Copyright 1996 by Darius Bacon; see the file COPYING.
 
-package expr;
+package com.hr.expr.parser;
 
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.hr.expr.expression.Expr;
 
 /**
  * Parses strings representing mathematical formulas with variables. The
@@ -69,7 +72,7 @@ public class Parser {
 	 * Set of Variable's that are allowed to appear in input expressions. If
 	 * null, any variable is allowed.
 	 */
-	private Hashtable<Variable, Variable> allowedVariables = null;
+	private Map<Variable, Variable> allowedVariables = null;
 
 	/**
 	 * Adjust the set of allowed variables: create it (if not yet existent) and
@@ -81,7 +84,7 @@ public class Parser {
 	 */
 	public void allow(Variable optVariable) {
 		if (null == allowedVariables) {
-			allowedVariables = new Hashtable<Variable, Variable>();
+			allowedVariables = new HashMap<Variable, Variable>();
 			allowedVariables.put(pi, pi);
 		}
 		if (null != optVariable)
@@ -133,79 +136,80 @@ public class Parser {
 
 			switch (token.ttype) {
 
-			case '<':
-				l = 20;
-				r = 21;
-				rator = Expr.LT;
-				break;
-			case Token.TT_LE:
-				l = 20;
-				r = 21;
-				rator = Expr.LE;
-				break;
-			case '=':
-				l = 20;
-				r = 21;
-				rator = Expr.EQ;
-				break;
-			case Token.TT_NE:
-				l = 20;
-				r = 21;
-				rator = Expr.NE;
-				break;
-			case Token.TT_GE:
-				l = 20;
-				r = 21;
-				rator = Expr.GE;
-				break;
-			case '>':
-				l = 20;
-				r = 21;
-				rator = Expr.GT;
-				break;
-
-			case '+':
-				l = 30;
-				r = 31;
-				rator = Expr.ADD;
-				break;
-			case '-':
-				l = 30;
-				r = 31;
-				rator = Expr.SUB;
-				break;
-
-			case '/':
-				l = 40;
-				r = 41;
-				rator = Expr.DIV;
-				break;
-			case '*':
-				l = 40;
-				r = 41;
-				rator = Expr.MUL;
-				break;
-
-			case '^':
-				l = 50;
-				r = 50;
-				rator = Expr.POW;
-				break;
-
-			default:
-				if (token.ttype == Token.TT_WORD && token.sval.equals("and")) {
-					l = 5;
-					r = 6;
-					rator = Expr.AND;
+				case '<':
+					l = 20;
+					r = 21;
+					rator = Expr.LT;
 					break;
-				}
-				if (token.ttype == Token.TT_WORD && token.sval.equals("or")) {
-					l = 10;
-					r = 11;
-					rator = Expr.OR;
+				case Token.TT_LE:
+					l = 20;
+					r = 21;
+					rator = Expr.LE;
 					break;
-				}
-				break loop;
+				case '=':
+					l = 20;
+					r = 21;
+					rator = Expr.EQ;
+					break;
+				case Token.TT_NE:
+					l = 20;
+					r = 21;
+					rator = Expr.NE;
+					break;
+				case Token.TT_GE:
+					l = 20;
+					r = 21;
+					rator = Expr.GE;
+					break;
+				case '>':
+					l = 20;
+					r = 21;
+					rator = Expr.GT;
+					break;
+
+				case '+':
+					l = 30;
+					r = 31;
+					rator = Expr.ADD;
+					break;
+				case '-':
+					l = 30;
+					r = 31;
+					rator = Expr.SUB;
+					break;
+
+				case '/':
+					l = 40;
+					r = 41;
+					rator = Expr.DIV;
+					break;
+				case '*':
+					l = 40;
+					r = 41;
+					rator = Expr.MUL;
+					break;
+
+				case '^':
+					l = 50;
+					r = 50;
+					rator = Expr.POW;
+					break;
+
+				default:
+					if (token.ttype == Token.TT_WORD
+							&& token.sval.equals("and")) {
+						l = 5;
+						r = 6;
+						rator = Expr.AND;
+						break;
+					}
+					if (token.ttype == Token.TT_WORD && token.sval.equals("or")) {
+						l = 10;
+						r = 11;
+						rator = Expr.OR;
+						break;
+					}
+					break loop;
 			}
 
 			if (l < precedence)
@@ -228,65 +232,67 @@ public class Parser {
 
 	private Expr parseFactor() throws SyntaxException {
 		switch (token.ttype) {
-		case Token.TT_NUMBER: {
-			Expr lit = Expr.makeLiteral(token.nval);
-			nextToken();
-			return lit;
-		}
-		case Token.TT_WORD: {
-			for (int i = 0; i < procs1.length; ++i)
-				if (procs1[i].equals(token.sval)) {
-					nextToken();
-					expect('(');
-					Expr rand = parseExpr(0);
-					expect(')');
-					return Expr.makeApp1(rators1[i], rand);
-				}
-
-			for (int i = 0; i < procs2.length; ++i)
-				if (procs2[i].equals(token.sval)) {
-					nextToken();
-					expect('(');
-					Expr rand1 = parseExpr(0);
-					expect(',');
-					Expr rand2 = parseExpr(0);
-					expect(')');
-					return Expr.makeApp2(rators2[i], rand1, rand2);
-				}
-
-			if (token.sval.equals("if")) {
+			case Token.TT_NUMBER: {
+				Expr lit = Expr.makeLiteral(token.nval);
 				nextToken();
-				expect('(');
-				Expr test = parseExpr(0);
-				expect(',');
-				Expr consequent = parseExpr(0);
-				expect(',');
-				Expr alternative = parseExpr(0);
-				expect(')');
-				return Expr.makeIfThenElse(test, consequent, alternative);
+				return lit;
 			}
+			case Token.TT_WORD: {
+				for (int i = 0; i < procs1.length; ++i)
+					if (procs1[i].equals(token.sval)) {
+						nextToken();
+						expect('(');
+						Expr rand = parseExpr(0);
+						expect(')');
+						return Expr.makeApp1(rators1[i], rand);
+					}
 
-			Expr var = Variable.make(token.sval);
-			if (null != allowedVariables && null == allowedVariables.get(var))
-				throw error("Unknown variable",
-						SyntaxException.UNKNOWN_VARIABLE, null);
-			nextToken();
-			return var;
-		}
-		case '(': {
-			nextToken();
-			Expr enclosed = parseExpr(0);
-			expect(')');
-			return enclosed;
-		}
-		case '-':
-			nextToken();
-			return Expr.makeApp1(Expr.NEG, parseExpr(35));
-		case Token.TT_EOF:
-			throw error("Expected a factor", SyntaxException.PREMATURE_EOF,
-					null);
-		default:
-			throw error("Expected a factor", SyntaxException.BAD_FACTOR, null);
+				for (int i = 0; i < procs2.length; ++i)
+					if (procs2[i].equals(token.sval)) {
+						nextToken();
+						expect('(');
+						Expr rand1 = parseExpr(0);
+						expect(',');
+						Expr rand2 = parseExpr(0);
+						expect(')');
+						return Expr.makeApp2(rators2[i], rand1, rand2);
+					}
+
+				if (token.sval.equals("if")) {
+					nextToken();
+					expect('(');
+					Expr test = parseExpr(0);
+					expect(',');
+					Expr consequent = parseExpr(0);
+					expect(',');
+					Expr alternative = parseExpr(0);
+					expect(')');
+					return Expr.makeIfThenElse(test, consequent, alternative);
+				}
+
+				Expr var = Variable.make(token.sval);
+				if (null != allowedVariables
+						&& null == allowedVariables.get(var))
+					throw error("Unknown variable",
+							SyntaxException.UNKNOWN_VARIABLE, null);
+				nextToken();
+				return var;
+			}
+			case '(': {
+				nextToken();
+				Expr enclosed = parseExpr(0);
+				expect(')');
+				return enclosed;
+			}
+			case '-':
+				nextToken();
+				return Expr.makeApp1(Expr.NEG, parseExpr(35));
+			case Token.TT_EOF:
+				throw error("Expected a factor", SyntaxException.PREMATURE_EOF,
+						null);
+			default:
+				throw error("Expected a factor", SyntaxException.BAD_FACTOR,
+						null);
 		}
 	}
 
@@ -308,23 +314,23 @@ public class Parser {
 	}
 
 	private boolean tryInsertions() {
-		Vector<Token> v = tokens.tokens;
+		List<Token> v = tokens.tokens;
 		for (int i = tokens.index; 0 <= i; --i) {
 			Token t;
 			if (i < v.size()) {
-				t = (Token) v.elementAt(i);
+				t = (Token) v.get(i);
 			} else {
 				String s = tokens.getInput();
 				t = new Token(Token.TT_EOF, 0, s, s.length(), s.length());
 			}
 			Token[] candidates = possibleInsertions(t);
 			for (int j = 0; j < candidates.length; ++j) {
-				v.insertElementAt(candidates[j], i);
+				v.add(i, candidates[j]);
 				try {
 					reparse();
 					return true;
 				} catch (SyntaxException se) {
-					v.removeElementAt(i);
+					v.remove(i);
 				}
 			}
 		}
@@ -332,38 +338,38 @@ public class Parser {
 	}
 
 	private boolean tryDeletions() {
-		Vector<Token> v = tokens.tokens;
+		List<Token> v = tokens.tokens;
 		for (int i = tokens.index; 0 <= i; --i) {
 			if (v.size() <= i)
 				continue;
-			Token t = v.elementAt(i);
+			Token t = v.get(i);
 			v.remove(i);
 			try {
 				reparse();
 				return true;
 			} catch (SyntaxException se) {
-				v.insertElementAt(t, i);
+				v.add(i, t);
 			}
 		}
 		return false;
 	}
 
 	private boolean trySubstitutions() {
-		Vector<Token> v = tokens.tokens;
+		List<Token> v = tokens.tokens;
 		for (int i = tokens.index; 0 <= i; --i) {
 			if (v.size() <= i)
 				continue;
-			Token t = (Token) v.elementAt(i);
+			Token t = v.get(i);
 			Token[] candidates = possibleSubstitutions(t);
 			for (int j = 0; j < candidates.length; ++j) {
-				v.setElementAt(candidates[j], i);
+				v.set(i, candidates[j]);
 				try {
 					reparse();
 					return true;
 				} catch (SyntaxException se) {
 				}
 			}
-			v.setElementAt(t, i);
+			v.set(i, t);
 		}
 		return false;
 	}

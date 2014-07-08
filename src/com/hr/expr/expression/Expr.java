@@ -1,7 +1,8 @@
 // Mathematical expressions.
 // Copyright 1996 by Darius Bacon; see the file COPYING.
 
-package expr;
+package com.hr.expr.expression;
+
 
 /**
  * A mathematical expression, built out of literal numbers, variables,
@@ -141,133 +142,5 @@ public abstract class Expr {
 			return test.value() != 0 ? consequent : alternative;
 		else
 			return cond;
-	}
-}
-
-// These classes are all private to this module because we could
-// plausibly want to do it in a completely different way, such as a
-// stack machine.
-
-class LiteralExpr extends Expr {
-	double v;
-
-	LiteralExpr(double v) {
-		this.v = v;
-	}
-
-	public double value() {
-		return v;
-	}
-}
-
-class UnaryExpr extends Expr {
-	int rator;
-	Expr rand;
-
-	UnaryExpr(int rator, Expr rand) {
-		this.rator = rator;
-		this.rand = rand;
-	}
-
-	public double value() {
-		double arg = rand.value();
-		switch (rator) {
-		case ABS:
-			return Math.abs(arg);
-		case ACOS:
-			return Math.acos(arg);
-		case ASIN:
-			return Math.asin(arg);
-		case ATAN:
-			return Math.atan(arg);
-		case CEIL:
-			return Math.ceil(arg);
-		case COS:
-			return Math.cos(arg);
-		case EXP:
-			return Math.exp(arg);
-		case FLOOR:
-			return Math.floor(arg);
-		case LOG:
-			return Math.log(arg);
-		case NEG:
-			return -arg;
-		case ROUND:
-			return Math.rint(arg);
-		case SIN:
-			return Math.sin(arg);
-		case SQRT:
-			return Math.sqrt(arg);
-		case TAN:
-			return Math.tan(arg);
-		default:
-			throw new RuntimeException("BUG: bad rator");
-		}
-	}
-}
-
-class BinaryExpr extends Expr {
-	int rator;
-	Expr rand0, rand1;
-
-	BinaryExpr(int rator, Expr rand0, Expr rand1) {
-		this.rator = rator;
-		this.rand0 = rand0;
-		this.rand1 = rand1;
-	}
-
-	public double value() {
-		double arg0 = rand0.value();
-		double arg1 = rand1.value();
-		switch (rator) {
-		case ADD:
-			return arg0 + arg1;
-		case SUB:
-			return arg0 - arg1;
-		case MUL:
-			return arg0 * arg1;
-		case DIV:
-			return arg0 / arg1; // division by 0 has IEEE 754 behavior
-		case POW:
-			return Math.pow(arg0, arg1);
-		case ATAN2:
-			return Math.atan2(arg0, arg1);
-		case MAX:
-			return arg0 < arg1 ? arg1 : arg0;
-		case MIN:
-			return arg0 < arg1 ? arg0 : arg1;
-		case LT:
-			return arg0 < arg1 ? 1.0 : 0.0;
-		case LE:
-			return arg0 <= arg1 ? 1.0 : 0.0;
-		case EQ:
-			return arg0 == arg1 ? 1.0 : 0.0;
-		case NE:
-			return arg0 != arg1 ? 1.0 : 0.0;
-		case GE:
-			return arg0 >= arg1 ? 1.0 : 0.0;
-		case GT:
-			return arg0 > arg1 ? 1.0 : 0.0;
-		case AND:
-			return arg0 != 0 && arg1 != 0 ? 1.0 : 0.0;
-		case OR:
-			return arg0 != 0 || arg1 != 0 ? 1.0 : 0.0;
-		default:
-			throw new RuntimeException("BUG: bad rator");
-		}
-	}
-}
-
-class ConditionalExpr extends Expr {
-	Expr test, consequent, alternative;
-
-	ConditionalExpr(Expr test, Expr consequent, Expr alternative) {
-		this.test = test;
-		this.consequent = consequent;
-		this.alternative = alternative;
-	}
-
-	public double value() {
-		return test.value() != 0 ? consequent.value() : alternative.value();
 	}
 }

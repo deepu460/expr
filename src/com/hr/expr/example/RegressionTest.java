@@ -1,4 +1,9 @@
-package expr;
+package com.hr.expr.example;
+
+import com.hr.expr.expression.Expr;
+import com.hr.expr.parser.Parser;
+import com.hr.expr.parser.SyntaxException;
+import com.hr.expr.parser.Variable;
 
 /**
  * Test for bugs in the whole package.

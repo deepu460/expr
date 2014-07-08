@@ -1,6 +1,6 @@
 // A lexical token from an input string.
 
-package expr;
+package com.hr.expr.parser;
 
 class Token {
 
