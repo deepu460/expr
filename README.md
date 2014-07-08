@@ -66,8 +66,16 @@ If the string couldn't be parsed, complain and abort.  The `e.explain()`
 tries to describe exactly what went wrong.
 
     catch (SyntaxException e) {
-        System.err.println(e.explain())
+        System.err.println(e.explain());
         return;
+    }
+
+Alternatively, you can choose to use the `e.printExplanation()` method for ease
+of use.
+
+    catch (SyntaxException e) {
+    	e.printExplanation();
+    	return;
     }
 
 Create a variable-object for `x`, so that we can control the value that
